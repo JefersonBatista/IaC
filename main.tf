@@ -19,7 +19,7 @@ resource "aws_instance" "app_server" {
   instance_type = "t2.micro"
 
   tags = {
-    Name = "BashCodeInstance"
+    Name = "DjangoProjectInstance"
   }
   key_name = "my-first-instance-key"
 }

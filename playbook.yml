@@ -1,8 +1,25 @@
 - hosts: terraform-ansible
   tasks:
-    - name: Create HTML file
-      copy:
-        dest: /home/ubuntu/index.html
-        content: <h1>Gorassim! Aprendendo coisas novas de novo!</h1>
-    - name: Start server
-      shell: nohup busybox httpd -f -p 8080 &
+    - name: Install Python3 and VirtualEnv
+      become: yes
+      apt:
+        update_cache: yes
+        pkg:
+          - python3
+          - virtualenv
+    - name: Install dependencies with pip (Django and Django Rest)
+      pip:
+        virtualenv: /home/ubuntu/tcc/venv
+        name:
+          - django
+          - djangorestframework
+    - name: Start the project
+      shell: 'cd /home/ubuntu/tcc; . venv/bin/activate; django-admin startproject setup .'
+    - name: Setup allowed hosts of the project
+      lineinfile:
+        path: /home/ubuntu/tcc/setup/settings.py
+        regexp: ALLOWED_HOSTS
+        line: 'ALLOWED_HOSTS = ["*"]'
+        backrefs: yes
+    - name: Run the project
+      shell: 'cd /home/ubuntu/tcc; . venv/bin/activate; nohup python3 manage.py runserver 0.0.0.0:8000 &'
