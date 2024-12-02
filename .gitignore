@@ -8,6 +8,10 @@
 
 # access keys
 *.pem
+IaC-DEV
+IaC-DEV.pub
+IaC-PRD
+IaC-PRD.pub
 
 # vscode configs
 .vscode
