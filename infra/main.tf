@@ -11,15 +11,20 @@ terraform {
 
 provider "aws" {
   profile = "default"
-  region  = "us-east-2"
+  region  = var.aws_region
 }
 
 resource "aws_instance" "app_server" {
   ami           = "ami-0ea3c35c5c3284d82"
-  instance_type = "t2.micro"
+  instance_type = var.instance
 
   tags = {
     Name = "DjangoProjectInstance"
   }
-  key_name = "my-first-instance-key"
+  key_name = var.key
+}
+
+resource "aws_key_pair" "ssh_key" {
+  key_name   = var.key
+  public_key = file("${var.key}.pub")
 }
