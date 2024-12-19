@@ -1,4 +1,4 @@
-- hosts: terraform-ansible-dev
+- hosts: terraform-ansible-prd
   tasks:
     - name: Install Python3 and VirtualEnv
       become: yes
@@ -7,20 +7,23 @@
         pkg:
           - python3
           - virtualenv
+    - name: Verify project existence
+      stat:
+        path: /home/ubuntu/tcc/setup/settings.py
+      register: project
+    - name: Clone project
+      git:
+        repo: https://github.com/alura-cursos/clientes-leo-api
+        dest: /home/ubuntu/tcc
+        version: master
+      when: not project.stat.exists
     - name: Install dependencies with pip (Django and Django Rest)
       pip:
         virtualenv: /home/ubuntu/tcc/venv
         name:
           - django
           - djangorestframework
-    - name: Verify project existence
-      stat:
-        path: /home/ubuntu/tcc/setup/settings.py
-      register: project
-    - name: Start the project
-      shell: 'cd /home/ubuntu/tcc; . venv/bin/activate; django-admin startproject setup .'
-      when: not project.stat.exists
-    - name: Setup allowed hosts of the project
+    - name: Set allowed hosts of the project
       lineinfile:
         path: /home/ubuntu/tcc/setup/settings.py
         regexp: ALLOWED_HOSTS
