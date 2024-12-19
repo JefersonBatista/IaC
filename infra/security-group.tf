@@ -1,6 +1,6 @@
 resource "aws_security_group" "general_access" {
-  name        = "general_access"
-  description = "dev group"
+  name        = var.security_group_name
+  description = var.security_group_description
   ingress {
     description      = "Receive from all internet"
     cidr_blocks      = ["0.0.0.0/0"]
