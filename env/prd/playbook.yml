@@ -13,16 +13,15 @@
       register: project
     - name: Clone project
       git:
-        repo: https://github.com/alura-cursos/clientes-leo-api
+        repo: https://github.com/JefersonBatista/clientes-leo-api
         dest: /home/ubuntu/tcc
         version: master
+        force: yes
       when: not project.stat.exists
     - name: Install dependencies with pip (Django and Django Rest)
       pip:
         virtualenv: /home/ubuntu/tcc/venv
-        name:
-          - django
-          - djangorestframework
+        requirements: /home/ubuntu/tcc/requirements.txt
     - name: Set allowed hosts of the project
       lineinfile:
         path: /home/ubuntu/tcc/setup/settings.py
