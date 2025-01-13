@@ -15,8 +15,9 @@ provider "aws" {
 }
 
 resource "aws_instance" "app_server" {
-  ami           = "ami-0ea3c35c5c3284d82"
-  instance_type = var.instance
+  ami             = "ami-0ea3c35c5c3284d82"
+  instance_type   = var.instance
+  security_groups = [var.security_group_name]
 
   tags = {
     Name = "DjangoProjectInstance"
