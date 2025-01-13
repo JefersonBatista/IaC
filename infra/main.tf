@@ -14,13 +14,13 @@ provider "aws" {
   region  = var.aws_region
 }
 
-resource "aws_instance" "app_server" {
-  ami             = "ami-0ea3c35c5c3284d82"
-  instance_type   = var.instance
-  security_groups = [var.security_group_name]
+resource "aws_launch_template" "app_machine_model" {
+  image_id             = "ami-0ea3c35c5c3284d82"
+  instance_type        = var.instance
+  security_group_names = [var.security_group_name]
 
   tags = {
-    Name = "DjangoProjectInstance"
+    Name = "DjangoProjectMachineModel"
   }
   key_name = var.key
 }
