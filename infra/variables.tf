@@ -17,3 +17,15 @@ variable "security_group_name" {
 variable "security_group_description" {
   type = string
 }
+
+variable "autoscaling_group_name" {
+  type = string
+}
+
+variable "min_machines" {
+  type = number
+}
+
+variable "max_machines" {
+  type = number
+}

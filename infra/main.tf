@@ -18,6 +18,7 @@ resource "aws_launch_template" "app_machine_model" {
   image_id             = "ami-0ea3c35c5c3284d82"
   instance_type        = var.instance
   security_group_names = [var.security_group_name]
+  user_data            = filebase64("ansible.sh")
 
   tags = {
     Name = "DjangoProjectMachineModel"
@@ -30,10 +31,12 @@ resource "aws_key_pair" "ssh_key" {
   public_key = file("${var.key}.pub")
 }
 
-output "public_ip" {
-  value = aws_instance.app_server.public_ip
-}
-
-output "public_dns" {
-  value = aws_instance.app_server.public_dns
+resource "aws_autoscaling_group" "autoscaling_group" {
+  name = var.autoscaling_group_name
+  launch_template {
+    id = aws_launch_template.app_machine_model.id
+  }
+  availability_zones = ["${var.aws_region}a"]
+  min_size           = var.min_machines
+  max_size           = var.max_machines
 }
