@@ -36,7 +36,41 @@ resource "aws_autoscaling_group" "autoscaling_group" {
   launch_template {
     id = aws_launch_template.app_machine_model.id
   }
-  availability_zones = ["${var.aws_region}a"]
+  availability_zones = ["${var.aws_region}a", "${var.aws_region}b"]
   min_size           = var.min_machines
   max_size           = var.max_machines
+  target_group_arns  = [aws_lb_target_group.target_group.arn]
+}
+
+resource "aws_default_subnet" "subnet_1" {
+  availability_zone = "${var.aws_region}a"
+}
+
+resource "aws_default_subnet" "subnet_2" {
+  availability_zone = "${var.aws_region}b"
+}
+
+resource "aws_lb" "load_balancer" {
+  name     = "load_balancer"
+  internal = false
+  subnets  = [aws_default_subnet.subnet_1.id, aws_default_subnet.subnet_2.id]
+}
+
+resource "aws_default_vpc" "default" {}
+
+resource "aws_lb_target_group" "target_group" {
+  name     = "target_group"
+  vpc_id   = aws_default_vpc.default.id
+  protocol = "HTTP"
+  port     = "8000"
+}
+
+resource "aws_lb_listener" "load_balancer_listener" {
+  load_balancer_arn = aws_lb.load_balancer.arn
+  protocol          = "HTTP"
+  port              = "8000"
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.target_group.arn
+  }
 }
