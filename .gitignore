@@ -1,5 +1,4 @@
-### Terraform ###
-# Local .terraform directories
+# local .terraform directories
 **/.terraform/*
 
 # .tfstate files
@@ -15,3 +14,6 @@ IaC-PRD.pub
 
 # vscode configs
 .vscode
+
+# python cache files
+__pycache__
