@@ -29,3 +29,7 @@ variable "min_machines" {
 variable "max_machines" {
   type = number
 }
+
+variable "is_production" {
+  type = bool
+}

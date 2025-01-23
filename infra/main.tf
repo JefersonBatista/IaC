@@ -18,7 +18,7 @@ resource "aws_launch_template" "app_machine_model" {
   image_id             = "ami-0ea3c35c5c3284d82"
   instance_type        = var.instance
   security_group_names = [var.security_group_name]
-  user_data            = filebase64("ansible.sh")
+  user_data            = var.is_production ? filebase64("ansible.sh") : ""
 
   tags = {
     Name = "DjangoProjectMachineModel"
@@ -39,7 +39,7 @@ resource "aws_autoscaling_group" "autoscaling_group" {
   availability_zones = ["${var.aws_region}a", "${var.aws_region}b"]
   min_size           = var.min_machines
   max_size           = var.max_machines
-  target_group_arns  = [aws_lb_target_group.target_group.arn]
+  target_group_arns  = var.is_production ? [aws_lb_target_group.target_group[0].arn] : []
 }
 
 resource "aws_default_subnet" "subnet_1" {
@@ -54,6 +54,7 @@ resource "aws_lb" "load_balancer" {
   name     = "loadBalancer"
   internal = false
   subnets  = [aws_default_subnet.subnet_1.id, aws_default_subnet.subnet_2.id]
+  count    = var.is_production ? 1 : 0
 }
 
 resource "aws_default_vpc" "default" {}
@@ -63,16 +64,18 @@ resource "aws_lb_target_group" "target_group" {
   vpc_id   = aws_default_vpc.default.id
   protocol = "HTTP"
   port     = "8000"
+  count    = var.is_production ? 1 : 0
 }
 
 resource "aws_lb_listener" "load_balancer_listener" {
-  load_balancer_arn = aws_lb.load_balancer.arn
+  load_balancer_arn = aws_lb.load_balancer[0].arn
   protocol          = "HTTP"
   port              = "8000"
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.target_group.arn
+    target_group_arn = aws_lb_target_group.target_group[0].arn
   }
+  count = var.is_production ? 1 : 0
 }
 
 resource "aws_autoscaling_policy" "terraform_scaling" {
@@ -85,4 +88,5 @@ resource "aws_autoscaling_policy" "terraform_scaling" {
     }
     target_value = 50.0
   }
+  count = var.is_production ? 1 : 0
 }

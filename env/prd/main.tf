@@ -8,4 +8,5 @@ module "aws-prd" {
   autoscaling_group_name     = "prd_machines"
   min_machines               = 1
   max_machines               = 10
+  is_production              = true
 }
